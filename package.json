@@ -1,0 +1,29 @@
+{
+  "name": "express-javascript",
+  "version": "1.0.0",
+  "description": "Learning Node.js",
+  "keywords": [
+    "node",
+    "nodejs"
+  ],
+  "license": "ISC",
+  "author": "Brandon Argel Verdeja Domínguez",
+  "type": "ESM",
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
+    "standard": "^17.1.2"
+  },
+  "eslintConfig": {
+    "extends": "standard"
+  }
+}
