@@ -1,0 +1,18 @@
+### Get ditto data
+GET http://localhost:3000/pokemon/ditto
+
+### Create a new pokemon
+POST http://localhost:3000/pokemon
+Content-Type: application/json
+
+{
+  "name": "Pikachu",
+  "type": "Electric",
+  "level": 25,
+  "moves": [
+    "Thunder Shock",
+    "Quick Attack",
+    "Iron Tail",
+    "Electro Ball"
+  ]
+}

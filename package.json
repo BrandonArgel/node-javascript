@@ -8,18 +8,24 @@
   ],
   "license": "ISC",
   "author": "Brandon Argel Verdeja Domínguez",
-  "type": "ESM",
+  "type": "module",
   "main": "src/index.js",
   "scripts": {
+    "dev": "nodemon src/index.js",
+    "dev:1": "nodemon src/class-2/http",
+    "dev:2": "nodemon src/class-2/routing",
+    "dev:3": "node --watch src/class-2/express",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "express": "^5.2.1",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "eslint-config-prettier": "^10.1.8",
+    "nodemon": "^3.1.14",
     "prettier": "^3.8.1",
     "standard": "^17.1.2"
   },
