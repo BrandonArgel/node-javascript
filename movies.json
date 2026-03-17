@@ -1,0 +1,93 @@
+[
+  {
+    "id": "9bf6c6a3-01cb-4821-bfdb-011fdc27eca5",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "rate": 10
+  },
+  {
+    "id": "fc543b78-aee4-434d-9b8b-c2000d758d21",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "rate": 9.2
+  },
+  {
+    "id": "629914e2-c6d5-428f-95fa-92b50693f253",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "rate": 9.2
+  },
+  {
+    "id": "4b99333e-4ce3-420f-a867-deb7499fd7e3",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "rate": 9.2
+  },
+  {
+    "id": "9a6c58dd-76d5-4d39-9274-d4b605754ffb",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "rate": 9.2
+  },
+  {
+    "id": "17b29271-a849-4a60-b866-6d89c27be481",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "rate": 9.2
+  },
+  {
+    "id": "55acd8ef-8a54-4e11-8ce5-13ff9dd9f602",
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "duration": 175,
+    "rate": 9.2,
+    "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+    "genre": [
+      "Crime",
+      "Drama"
+    ]
+  }
+]
