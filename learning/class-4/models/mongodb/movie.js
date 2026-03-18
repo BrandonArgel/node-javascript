@@ -1,6 +1,13 @@
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
-const uri =
-  'mongodb+srv://user:???@cluster0.dhwmu.mongodb.net/?retryWrites=true&w=majority'
+import 'dotenv/config'
+
+const uri = process.env.MONGODB_URI
+
+if (!uri) {
+  throw new Error(
+    'Please set the MONGODB_URI environment variable in your .env file with your MongoDB connection string'
+  )
+}
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -11,65 +18,72 @@ const client = new MongoClient(uri, {
   }
 })
 
+let dbInstance = null
+
 async function connect() {
+  // If we already have a connection, return the existing instance
+  if (dbInstance) {
+    return dbInstance
+  }
+
   try {
+    // If no connection exists, connect to MongoDB Atlas
     await client.connect()
-    const database = client.db('database')
-    return database.collection('movies')
+    console.log('📦 Successfully connected to MongoDB')
+
+    // Save the database instance for future use
+    const database = client.db('sample_mflix')
+    dbInstance = database.collection('movies')
+
+    return dbInstance
   } catch (error) {
-    console.error('Error connecting to the database')
-    console.error(error)
-    await client.close()
+    console.error('❌ Error connecting to the database:', error)
+    throw new Error('Could not connect to the database')
   }
 }
 
 export class MovieModel {
   static async getAll({
-    genre,
+    genres,
     year,
     director,
     minRate,
     page = 1,
     limit = 10
   }) {
-    const db = await connect()
+    const collection = await connect()
 
-    // 1. Initialize an empty query object that we will build based on the provided filters
     const query = {}
 
-    // 2. Build the query dynamically based on the presence of each filter
-    if (genre) {
-      // Support for multiple genres by allowing genre to be an array or a single value
-      const genresArray = Array.isArray(genre) ? genre : [genre]
-      query.genre = {
-        $in: genresArray.map((g) => new RegExp(g, 'i'))
-      }
+    if (genres) {
+      const genresArray = Array.isArray(genres) ? genres : [genres]
+      query.genres = { $in: genresArray.map((g) => new RegExp(g, 'i')) }
     }
 
     if (year) {
-      query.year = parseInt(year, 10) // Exact match
+      query.year = parseInt(year, 10)
     }
 
     if (director) {
-      query.director = { $regex: director, $options: 'i' } // Partial search and case-insensitive
+      query.directors = { $regex: director, $options: 'i' }
     }
 
     if (minRate) {
-      query.rate = { $gte: parseFloat(minRate) } // Greater than or equal to minRate
+      query['imdb.rating'] = { $gte: parseFloat(minRate) }
     }
 
-    // 3. Pagination Logic
     const pageNumber = parseInt(page, 10)
     const limitNumber = parseInt(limit, 10)
     const skip = (pageNumber - 1) * limitNumber
 
-    // 4. Execute the query with find, skip and limit
-    const movies = await db.find(query).skip(skip).limit(limitNumber).toArray()
+    // Ejecutamos la consulta en la colección
+    const movies = await collection
+      .find(query)
+      .skip(skip)
+      .limit(limitNumber)
+      .toArray()
+    const totalItems = await collection.countDocuments(query)
 
-    // 5. Count total items matching the query for pagination metadata
-    const totalItems = await db.countDocuments(query)
-
-    // 6. Return an object with metadata and the actual data
     return {
       info: {
         totalItems,
@@ -82,15 +96,15 @@ export class MovieModel {
   }
 
   static async getById({ id }) {
-    const db = await connect()
+    const collection = await connect()
     const objectId = new ObjectId(id)
-    return db.findOne({ _id: objectId })
+    return collection.findOne({ _id: objectId })
   }
 
   static async create({ input }) {
-    const db = await connect()
+    const collection = await connect()
 
-    const { insertedId } = await db.insertOne(input)
+    const { insertedId } = await collection.insertOne(input)
 
     return {
       id: insertedId,
@@ -98,18 +112,11 @@ export class MovieModel {
     }
   }
 
-  static async delete({ id }) {
-    const db = await connect()
-    const objectId = new ObjectId(id)
-    const { deletedCount } = await db.deleteOne({ _id: objectId })
-    return deletedCount > 0
-  }
-
   static async update({ id, input }) {
-    const db = await connect()
+    const collection = await connect()
     const objectId = new ObjectId(id)
 
-    const { ok, value } = await db.findOneAndUpdate(
+    const { ok, value } = await collection.findOneAndUpdate(
       { _id: objectId },
       { $set: input },
       { returnNewDocument: true }
@@ -118,5 +125,12 @@ export class MovieModel {
     if (!ok) return false
 
     return value
+  }
+
+  static async delete({ id }) {
+    const collection = await connect()
+    const objectId = new ObjectId(id)
+    const { deletedCount } = await collection.deleteOne({ _id: objectId })
+    return deletedCount > 0
   }
 }

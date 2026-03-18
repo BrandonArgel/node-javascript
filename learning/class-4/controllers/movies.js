@@ -1,14 +1,14 @@
-import { MovieModel } from '../models/local-file-system/movie.js'
-// import { MovieModel } from '../models/database/movie.js'
+// import { MovieModel } from '../models/local-file-system/movie.js'
+import { MovieModel } from '../models/mongodb/movie.js'
 import { validateMovie, validatePartialMovie } from '../schemas/movies.js'
 
 export class MovieController {
   static async getAll(req, res) {
-    const { genre, year, director, minRate, page, limit } = req.query
+    const { genres, year, directors, minRate, page, limit } = req.query
     const movies = await MovieModel.getAll({
-      genre,
+      genres,
       year,
-      director,
+      directors,
       minRate,
       page,
       limit

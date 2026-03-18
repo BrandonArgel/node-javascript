@@ -12,7 +12,7 @@ const movieSchema = z.object({
   poster: z.string().url({
     message: 'Poster must be a valid URL'
   }),
-  genre: z.array(
+  genres: z.array(
     z.enum([
       'Action',
       'Adventure',
