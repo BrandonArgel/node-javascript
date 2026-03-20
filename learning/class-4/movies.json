@@ -17,7 +17,7 @@
     "duration": 152,
     "poster": "https://i.ebayimg.com/images/g/yokAAOSw8w1YARbm/s-l1200.jpg",
     "genre": ["Action", "Crime", "Drama"],
-    "rate": 9.0
+    "rate": 9
   },
   {
     "id": "5ad1a235-0d9c-410a-b32b-220d91689a08",
@@ -107,7 +107,7 @@
     "duration": 143,
     "poster": "https://img.fruugo.com/product/7/41/14532417_max.jpg",
     "genre": ["Action", "Adventure", "Sci-Fi"],
-    "rate": 8.0
+    "rate": 8
   },
   {
     "id": "7d2832f8-c70a-410e-8963-4c93bf36cc9c",
