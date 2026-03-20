@@ -1,15 +1,11 @@
 import cors from 'cors'
 
-const ACCEPTED_ORIGINS = [
-  'http://localhost:8080',
-  'http://localhost:1234',
-  'https://movies.com',
-  'https://midu.dev'
-]
+const ACCEPTED_ORIGINS = ['http://localhost:8080', 'http://localhost:3000']
 
 export const corsMiddleware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) =>
   cors({
     origin: (origin, callback) => {
+      console.log('Received request from origin:', origin)
       if (acceptedOrigins.includes(origin)) {
         return callback(null, true)
       }
