@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto'
+import fs from 'node:fs/promises'
 import movies from '../../movies.json' with { type: 'json' }
 
 export class MovieModel {
   static async getAll({
-    genre,
+    genres,
     year,
     director,
     minRate,
@@ -15,12 +16,12 @@ export class MovieModel {
       // Start by assuming the movie matches
       let isValid = true
 
-      // Filter by Genre (Case-insensitive)
-      if (genre && isValid) {
-        const requestedGenres = Array.isArray(genre) ? genre : [genre]
+      // Filter by Genres (Case-insensitive)
+      if (genres && isValid) {
+        const requestedGenres = Array.isArray(genres) ? genres : [genres]
 
         isValid = requestedGenres.some((reqGenre) =>
-          movie.genre.some(
+          movie.genres.some(
             (movieGenre) => movieGenre.toLowerCase() === reqGenre.toLowerCase()
           )
         )
@@ -83,6 +84,13 @@ export class MovieModel {
 
     movies.push(newMovie)
 
+    // Write the updated movies array back to the JSON file
+    try {
+      await fs.writeFile('./movies.json', JSON.stringify(movies), 'utf-8')
+    } catch (error) {
+      console.error('Error writing to movies.json:', error)
+    }
+
     return newMovie
   }
 
@@ -91,6 +99,9 @@ export class MovieModel {
     if (movieIndex === -1) return false
 
     movies.splice(movieIndex, 1)
+
+    await fs.writeFile('./movies.json', JSON.stringify(movies), 'utf-8')
+
     return true
   }
 
@@ -102,6 +113,8 @@ export class MovieModel {
       ...movies[movieIndex],
       ...input
     }
+
+    await fs.writeFile('./movies.json', JSON.stringify(movies), 'utf-8')
 
     return movies[movieIndex]
   }
