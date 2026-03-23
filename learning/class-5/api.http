@@ -1,0 +1,39 @@
+### Get all movies
+GET http://localhost:3000/movies?page=1&limit=20
+
+### Get a movie by ID
+### Local File System ID: dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+### MongoDB ID: 573a1390f29313caabcd42e8
+### MySQL ID: 
+GET http://localhost:3000/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+
+### Get all movies by genre
+GET http://localhost:3000/movies?genres=crime
+
+### Get all movies by genre with pagination
+GET http://localhost:3000/movies?genres=crime&page=1&limit=5
+
+### Create a new movie
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Godfather",
+  "year": 1972,
+  "director": "Francis Ford Coppola",
+  "duration": 175,
+  "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+  "genres": ["Crime", "Drama"],
+  "rate": 9.2
+}
+
+### Update a movie
+PATCH http://localhost:3000/movies/0ff940d9-d396-4776-8398-a2ce00a63646
+Content-Type: application/json
+
+{
+  "rate": 10
+}
+
+### Delete a movie
+DELETE http://localhost:3000/movies/0ff940d9-d396-4776-8398-a2ce00a63646
