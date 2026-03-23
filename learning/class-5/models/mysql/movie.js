@@ -1,15 +1,4 @@
-import mysql from 'mysql2/promise'
-
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  port: 3306,
-  password: '',
-  database: 'movies_db',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-})
+import { pool } from './db.js'
 
 export class MovieModel {
   static async getAll({
@@ -101,12 +90,12 @@ export class MovieModel {
   static async getById({ id }) {
     const [rows] = await pool.query(
       `
-    SELECT BIN_TO_UUID(id) as id, title, year, director, duration, poster, rate 
+    SELECT BIN_TO_UUID(id) as id, title, year, directors, duration, poster, rate 
     FROM movie 
     WHERE id = UUID_TO_BIN(?)
   `,
       [id]
-    ) // Id replaces the ? in the query
+    )
 
     return rows[0]
   }
@@ -127,16 +116,36 @@ export class MovieModel {
   }
 
   static async update({ id, input }) {
-    const { title, year, directors, duration, poster, rate } = input
+    const allowedFields = [
+      'title',
+      'year',
+      'directors',
+      'duration',
+      'poster',
+      'rate'
+    ]
 
-    const [result] = await pool.query(
-      `
-    UPDATE movie 
-    SET title = ?, year = ?, directors = ?, duration = ?, poster = ?, rate = ?
-    WHERE id = UUID_TO_BIN(?)
-  `,
-      [title, year, directors, duration, poster, rate, id]
+    const fieldsToUpdate = Object.keys(input).filter((key) =>
+      allowedFields.includes(key)
     )
+
+    if (fieldsToUpdate.length === 0) {
+      return false
+    }
+
+    const setClause = fieldsToUpdate.map((field) => `${field} = ?`).join(', ')
+
+    const values = fieldsToUpdate.map((field) => input[field])
+
+    values.push(id)
+
+    const query = `
+      UPDATE movie 
+      SET ${setClause}
+      WHERE id = UUID_TO_BIN(?)
+    `
+
+    const [result] = await pool.query(query, values)
 
     return result.affectedRows > 0
   }

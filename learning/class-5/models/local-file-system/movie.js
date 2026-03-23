@@ -61,13 +61,8 @@ export class MovieModel {
     // --- RESPONSE FORMATTING ---
     // 5. Return an object with the actual data
     return {
-      info: {
-        totalItems: filteredMovies.length,
-        totalPages: Math.ceil(filteredMovies.length / limitNumber),
-        currentPage: pageNumber,
-        limit: limitNumber
-      },
-      results: paginatedMovies
+      totalRecords: filteredMovies.length,
+      movies: paginatedMovies
     }
   }
 

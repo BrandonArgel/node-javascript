@@ -1,0 +1,36 @@
+### Get all movies
+GET http://localhost:3000/movies?page=1&limit=20
+
+### Get a movie by ID
+GET http://localhost:3000/movies/b3894a96-26f6-11f1-877a-10ffe0803e4d
+
+### Get all movies by genre
+GET http://localhost:3000/movies?genres=crime
+
+### Get all movies by genre with pagination
+GET http://localhost:3000/movies?genres=crime&page=1&limit=5
+
+### Create a new movie
+POST http://localhost:3000/movies
+Content-Type: application/json
+
+{
+  "title": "The Godfather",
+  "year": 1972,
+  "directors": "Francis Ford Coppola",
+  "duration": 175,
+  "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
+  "genres": ["Crime", "Drama"],
+  "rate": 9.2
+}
+
+### Update a movie
+PATCH http://localhost:3000/movies/b3894a96-26f6-11f1-877a-10ffe0803e4d
+Content-Type: application/json
+
+{
+  "rate": 10
+}
+
+### Delete a movie
+DELETE http://localhost:3000/movies/b3894a96-26f6-11f1-877a-10ffe0803e4d

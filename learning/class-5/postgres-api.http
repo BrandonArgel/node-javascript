@@ -2,10 +2,7 @@
 GET http://localhost:3000/movies?page=1&limit=20
 
 ### Get a movie by ID
-### Local File System ID: dcdd0fad-a94c-4810-8acc-5f108d3b18c3
-### MongoDB ID: 573a1390f29313caabcd42e8
-### MySQL ID: 
-GET http://localhost:3000/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+GET http://localhost:3000/movies/69c1a779655e65c063a7567e
 
 ### Get all movies by genre
 GET http://localhost:3000/movies?genres=crime
@@ -20,7 +17,7 @@ Content-Type: application/json
 {
   "title": "The Godfather",
   "year": 1972,
-  "director": "Francis Ford Coppola",
+  "directors": "Francis Ford Coppola",
   "duration": 175,
   "poster": "https://play-lh.googleusercontent.com/ZucjGxDqQ-cHIN-8YA1HgZx7dFhXkfnz73SrdRPmOOHEax08sngqZMR_jMKq0sZuv5P7-T2Z2aHJ1uGQiys",
   "genres": ["Crime", "Drama"],
@@ -28,7 +25,7 @@ Content-Type: application/json
 }
 
 ### Update a movie
-PATCH http://localhost:3000/movies/0ff940d9-d396-4776-8398-a2ce00a63646
+PATCH http://localhost:3000/movies/69c1a779655e65c063a7567e
 Content-Type: application/json
 
 {
@@ -36,4 +33,4 @@ Content-Type: application/json
 }
 
 ### Delete a movie
-DELETE http://localhost:3000/movies/0ff940d9-d396-4776-8398-a2ce00a63646
+DELETE http://localhost:3000/movies/69c1a779655e65c063a7567e

@@ -4,7 +4,9 @@
   "description": "",
   "main": "apps.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:local": "node server-with-local.js",
+    "start:mysql": "node server-with-mysql.js",
+    "start:mongodb": "node server-with-mongodb.js"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,3 @@
-// import { MovieModel } from '../models/local-file-system/movie.js'
-// import { MovieModel } from '../models/mongodb/movie.js'
-import { MovieModel } from '../models/mysql/movie.js'
 import {
   validateMovieQuery,
   validateMovie,
@@ -8,10 +5,13 @@ import {
 } from '../schemas/movies.js'
 
 export class MovieController {
-  static async getAll(req, res) {
+  constructor({ movieModel }) {
+    this.movieModel = movieModel
+  }
+
+  getAll = async (req, res) => {
     try {
       const validationResult = validateMovieQuery(req.query)
-      console.log('Validation result:', validationResult, req.query)
 
       if (!validationResult.success) {
         return res
@@ -21,7 +21,7 @@ export class MovieController {
 
       const { page, limit } = validationResult.data
 
-      const modelResult = await MovieModel.getAll(validationResult.data)
+      const modelResult = await this.movieModel.getAll(validationResult.data)
 
       const totalRecords = modelResult.totalRecords
       const totalPages = Math.ceil(totalRecords / limit)
@@ -45,49 +45,72 @@ export class MovieController {
     }
   }
 
-  static async getById(req, res) {
-    const { id } = req.params
-    const movie = await MovieModel.getById({ id })
-    if (movie) return res.json(movie)
-    res.status(404).json({ message: 'Movie not found' })
+  getById = async (req, res) => {
+    try {
+      const { id } = req.params
+      const movie = await this.movieModel.getById({ id })
+      if (movie) return res.json(movie)
+      res.status(404).json({ message: 'Movie not found' })
+    } catch (error) {
+      console.error('Error in getById:', error)
+      res.status(500).json({ message: error || 'Internal server error' })
+    }
   }
 
-  static async create(req, res) {
-    const result = validateMovie(req.body)
+  create = async (req, res) => {
+    try {
+      const result = validateMovie(req.body)
 
-    if (!result.success) {
-      // 422 Unprocessable Entity
-      return res.status(422).json({ error: JSON.parse(result.error.message) })
+      if (!result.success) {
+        // 422 Unprocessable Entity
+        return res.status(422).json({ error: JSON.parse(result.error.message) })
+      }
+
+      const newMovie = await this.movieModel.create({ input: result.data })
+
+      res.status(201).json(newMovie)
+    } catch (error) {
+      console.error('Error in create:', error)
+      res.status(500).json({ message: error || 'Internal server error' })
     }
-
-    const newMovie = await MovieModel.create({ input: result.data })
-
-    res.status(201).json(newMovie)
   }
 
-  static async delete(req, res) {
-    const { id } = req.params
+  update = async (req, res) => {
+    try {
+      const result = validatePartialMovie(req.body)
 
-    const result = await MovieModel.delete({ id })
+      if (!result.success) {
+        return res.status(422).json({ error: JSON.parse(result.error.message) })
+      }
 
-    if (result === false) {
-      return res.status(404).json({ message: 'Movie not found' })
+      const { id } = req.params
+
+      const updatedMovie = await this.movieModel.update({
+        id,
+        input: result.data
+      })
+
+      return res.json(updatedMovie)
+    } catch (error) {
+      console.error('Error in update:', error)
+      res.status(500).json({ message: error || 'Internal server error' })
     }
-
-    return res.json({ message: 'Movie deleted' })
   }
 
-  static async update(req, res) {
-    const result = validatePartialMovie(req.body)
+  delete = async (req, res) => {
+    try {
+      const { id } = req.params
 
-    if (!result.success) {
-      return res.status(422).json({ error: JSON.parse(result.error.message) })
+      const result = await this.movieModel.delete({ id })
+
+      if (result === false) {
+        return res.status(404).json({ message: 'Movie not found' })
+      }
+
+      return res.json({ message: 'Movie deleted' })
+    } catch (error) {
+      console.error('Error in delete:', error)
+      res.status(500).json({ message: 'Internal server error' })
     }
-
-    const { id } = req.params
-
-    const updatedMovie = await MovieModel.update({ id, input: result.data })
-
-    return res.json(updatedMovie)
   }
 }

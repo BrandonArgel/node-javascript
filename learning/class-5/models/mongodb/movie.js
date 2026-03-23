@@ -82,16 +82,11 @@ export class MovieModel {
       .skip(skip)
       .limit(limitNumber)
       .toArray()
-    const totalItems = await collection.countDocuments(query)
+    const totalRecords = await collection.countDocuments(query)
 
     return {
-      info: {
-        totalItems,
-        totalPages: Math.ceil(totalItems / limitNumber),
-        currentPage: pageNumber,
-        limit: limitNumber
-      },
-      results: movies
+      movies,
+      totalRecords
     }
   }
 
@@ -116,15 +111,15 @@ export class MovieModel {
     const collection = await connect()
     const objectId = new ObjectId(id)
 
-    const { ok, value } = await collection.findOneAndUpdate(
+    const result = await collection.findOneAndUpdate(
       { _id: objectId },
       { $set: input },
-      { returnNewDocument: true }
+      { returnDocument: 'after' }
     )
 
-    if (!ok) return false
+    if (!result) return false
 
-    return value
+    return result
   }
 
   static async delete({ id }) {
