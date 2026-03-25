@@ -1,0 +1,663 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Socket.IO chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0d1117;
+        --bg-secondary: #161b22;
+        --bubble-out: #2ea043;
+        --bubble-out-text: #ffffff;
+        --bubble-in: #21262d;
+        --bubble-in-text: #e6edf3;
+        --sender-name: #58a6ff;
+        --time-color: rgba(255, 255, 255, 0.4);
+        --form-bg: rgba(13, 17, 23, 0.9);
+        --input-bg: #21262d;
+        --input-text: #e6edf3;
+        --border: #30363d;
+        --green: #2ea043;
+        --green-hover: #3fb950;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg);
+        color: var(--bubble-in-text);
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ─────────────────────────────────────────────────────
+         Login modal
+      ───────────────────────────────────────────────────── */
+      #login-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 1rem;
+      }
+
+      #login-overlay.hidden {
+        display: none;
+      }
+
+      #login-box {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem 2rem 1.75rem;
+        width: 100%;
+        max-width: 360px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+        animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.92) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      #login-box .login-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2ea043, #1a7f37);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto;
+        box-shadow: 0 0 0 6px rgba(46, 160, 67, 0.15);
+      }
+
+      #login-box h1 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-align: center;
+        color: var(--input-text);
+      }
+
+      #login-box p {
+        margin: 0;
+        font-size: 0.82rem;
+        text-align: center;
+        color: var(--time-color);
+      }
+
+      #login-name {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+        font-family: inherit;
+        color: var(--input-text);
+        outline: none;
+        width: 100%;
+        transition: border-color 0.2s;
+      }
+
+      #login-name::placeholder {
+        color: rgba(230, 237, 243, 0.3);
+      }
+
+      #login-name:focus {
+        border-color: var(--green);
+      }
+
+      #login-error {
+        font-size: 0.78rem;
+        color: #f85149;
+        text-align: center;
+        min-height: 1rem;
+      }
+
+      #login-submit {
+        background: var(--green);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.65rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s, transform 0.1s;
+      }
+
+      #login-submit:hover {
+        background: var(--green-hover);
+      }
+
+      #login-submit:active {
+        transform: scale(0.97);
+      }
+
+      /* ─────────────────────────────────────────────────────
+         Header
+      ───────────────────────────────────────────────────── */
+      #header {
+        flex-shrink: 0;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        padding: 0.7rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      #header .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2ea043, #1a7f37);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        flex-shrink: 0;
+      }
+
+      #header .info h2 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--input-text);
+      }
+
+      #header .info p {
+        margin: 0;
+        font-size: 0.72rem;
+        color: var(--time-color);
+      }
+
+      #header .user-tag {
+        margin-left: auto;
+        font-size: 0.78rem;
+        color: var(--time-color);
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+
+      /* ─────────────────────────────────────────────────────
+         Messages list
+      ───────────────────────────────────────────────────── */
+      #messages {
+        flex: 1;
+        list-style-type: none;
+        margin: 0;
+        padding: 0.75rem 0.75rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        scroll-behavior: smooth;
+      }
+
+      #load-sentinel {
+        height: 1px;
+        width: 100%;
+        flex-shrink: 0;
+      }
+
+      #load-indicator {
+        text-align: center;
+        font-size: 0.72rem;
+        color: var(--time-color);
+        padding: 0.25rem 0;
+        opacity: 0;
+        transition: opacity 0.2s;
+        flex-shrink: 0;
+      }
+
+      #load-indicator.visible {
+        opacity: 1;
+      }
+
+      /* ─────────────────────────────────────────────────────
+         Message items — shared wrapper
+      ───────────────────────────────────────────────────── */
+      #messages > li {
+        display: flex;
+        flex-direction: column;
+        max-width: 72%;
+      }
+
+      /* ── Outgoing (own) — right side ── */
+      #messages > li.out {
+        align-self: flex-end;
+        align-items: flex-end;
+      }
+
+      #messages > li.out .bubble {
+        background: var(--bubble-out);
+        color: var(--bubble-out-text);
+        border-radius: 18px 18px 4px 18px;
+      }
+
+      /* ── Incoming — left side ── */
+      #messages > li.in {
+        align-self: flex-start;
+        align-items: flex-start;
+      }
+
+      #messages > li.in .bubble {
+        background: var(--bubble-in);
+        color: var(--bubble-in-text);
+        border-radius: 18px 18px 18px 4px;
+      }
+
+      /* Sender name shown above incoming bubbles */
+      .bubble-sender {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--sender-name);
+        margin-bottom: 0.18rem;
+        padding-left: 0.25rem;
+        user-select: none;
+      }
+
+      .bubble {
+        padding: 0.45rem 0.75rem 0.3rem;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        word-break: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+      }
+
+      .bubble-time {
+        font-size: 0.67rem;
+        color: var(--time-color);
+        margin-top: 0.18rem;
+        padding: 0 0.25rem;
+        user-select: none;
+      }
+
+      /* Group consecutive messages from same side closer together */
+      #messages > li + li.out,
+      #messages > li + li.in {
+        margin-top: 0.1rem;
+      }
+
+      /* Slightly more space between direction changes */
+      #messages > li.out + li.in,
+      #messages > li.in + li.out {
+        margin-top: 0.6rem;
+      }
+
+      /* ─────────────────────────────────────────────────────
+         Input form
+      ───────────────────────────────────────────────────── */
+      #form {
+        flex-shrink: 0;
+        background: var(--form-bg);
+        border-top: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      #input {
+        flex: 1;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 0.55rem 1.1rem;
+        font-size: 0.9rem;
+        font-family: inherit;
+        color: var(--input-text);
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      #input::placeholder {
+        color: rgba(230, 237, 243, 0.3);
+      }
+
+      #input:focus {
+        border-color: var(--green);
+      }
+
+      #send-btn {
+        background: var(--green);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.1s;
+        outline: none;
+      }
+
+      #send-btn:hover {
+        background: var(--green-hover);
+      }
+
+      #send-btn:active {
+        transform: scale(0.93);
+      }
+
+      #send-btn svg {
+        width: 18px;
+        height: 18px;
+        fill: #fff;
+        transform: translateX(1px);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login modal -->
+    <div id="login-overlay">
+      <div id="login-box">
+        <div class="login-icon">💬</div>
+        <div>
+          <h1>Join the chat</h1>
+          <p>Choose a name to get started</p>
+        </div>
+        <input
+          id="login-name"
+          type="text"
+          maxlength="24"
+          autocomplete="off"
+          placeholder="Your name…"
+        />
+        <div id="login-error"></div>
+        <button id="login-submit">Join</button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div id="header">
+      <div class="avatar">C</div>
+      <div class="info">
+        <h2>Group Chat</h2>
+        <p>Real-time · Socket.IO</p>
+      </div>
+      <div class="user-tag" id="user-tag"></div>
+    </div>
+
+    <!-- Messages -->
+    <ul id="messages">
+      <div id="load-sentinel"></div>
+      <div id="load-indicator">Loading older messages…</div>
+    </ul>
+
+    <!-- Input form -->
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Type a message…" />
+      <button id="send-btn" type="submit" aria-label="Send">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+        </svg>
+      </button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // ── Auth / login ──────────────────────────────────────
+
+      const loginOverlay = document.getElementById('login-overlay')
+      const loginName = document.getElementById('login-name')
+      const loginSubmit = document.getElementById('login-submit')
+      const loginError = document.getElementById('login-error')
+      const userTag = document.getElementById('user-tag')
+
+      let currentUser = localStorage.getItem('username') || ''
+
+      function showError(msg) {
+        loginError.textContent = msg
+      }
+
+      function applyUsername(name) {
+        currentUser = name
+        localStorage.setItem('username', name)
+        userTag.textContent = '👤 ' + name
+        loginOverlay.classList.add('hidden')
+        initSocket()
+      }
+
+      loginSubmit.addEventListener('click', () => {
+        const name = loginName.value.trim()
+        if (!name) {
+          showError('Please enter a name.')
+          return
+        }
+        if (name.length < 2) {
+          showError('Name must be at least 2 characters.')
+          return
+        }
+        applyUsername(name)
+      })
+
+      loginName.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loginSubmit.click()
+        showError('')
+      })
+
+      // If we already have a saved username, skip the modal immediately
+      if (currentUser) {
+        userTag.textContent = '👤 ' + currentUser
+        loginOverlay.classList.add('hidden')
+        initSocket()
+      } else {
+        loginName.focus()
+      }
+
+      // ── Socket setup (called after username is known) ─────
+
+      function initSocket() {
+        const socket = io({
+          auth: {
+            username: currentUser,
+            serverOffset: 0
+            // serverOffset: Number(localStorage.getItem('lastOffset')) || 0
+          }
+        })
+
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+        const messages = document.getElementById('messages')
+        const sentinel = document.getElementById('load-sentinel')
+        const loadIndicator = document.getElementById('load-indicator')
+
+        let oldestMessageId = null
+        let loading = false
+        let allLoaded = false
+
+        // ── Helpers ────────────────────────────────────────
+
+        function scrollToBottom() {
+          messages.scrollTop = messages.scrollHeight
+        }
+
+        function isNearBottom() {
+          return (
+            messages.scrollHeight - messages.scrollTop - messages.clientHeight <
+            100
+          )
+        }
+
+        function formatTime(isoString) {
+          if (!isoString || isoString === '1970-01-01T00:00:00Z') return ''
+          const d = new Date(isoString)
+          return d.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        }
+
+        function createBubble(msg, createdAt, username) {
+          const isOwn = username === currentUser
+          const li = document.createElement('li')
+          li.className = isOwn ? 'out' : 'in'
+
+          // Sender name — only for incoming messages
+          if (!isOwn && username) {
+            const sender = document.createElement('div')
+            sender.className = 'bubble-sender'
+            sender.textContent = username
+            li.appendChild(sender)
+          }
+
+          const bubble = document.createElement('div')
+          bubble.className = 'bubble'
+          bubble.textContent = msg
+          li.appendChild(bubble)
+
+          const timeStr = formatTime(createdAt)
+          if (timeStr) {
+            const time = document.createElement('div')
+            time.className = 'bubble-time'
+            time.textContent = timeStr
+            li.appendChild(time)
+          }
+
+          return li
+        }
+
+        // ── IntersectionObserver — trigger at ~80% scrolled ──
+
+        function loadMore() {
+          if (loading || allLoaded || !oldestMessageId) return
+          loading = true
+          loadIndicator.classList.add('visible')
+          socket.emit('load more messages', oldestMessageId)
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting) loadMore()
+          },
+          {
+            root: messages,
+            rootMargin: '0px 0px -80% 0px',
+            threshold: 0
+          }
+        )
+
+        observer.observe(sentinel)
+
+        // ── Socket events ──────────────────────────────────
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault()
+          if (input.value.trim()) {
+            socket.emit('chat message', input.value.trim())
+            input.value = ''
+          }
+        })
+
+        socket.on('connect', () => {
+          socket.emit('recover messages', socket.auth.serverOffset || 0)
+        })
+
+        socket.on('connect_error', (err) => {
+          // Server rejected the connection (e.g. empty username)
+          loginOverlay.classList.remove('hidden')
+          loginName.focus()
+          showError(err.message)
+        })
+
+        // Handles both initial messages and live incoming messages
+        socket.on('chat message', (msg, id, createdAt, username) => {
+          const nearBottom = isNearBottom()
+          const li = createBubble(msg, createdAt, username)
+          li.dataset.id = id
+
+          messages.appendChild(li)
+
+          if (id) {
+            socket.auth.serverOffset = id
+            // localStorage.setItem('lastOffset', id)
+
+            if (!oldestMessageId || Number(id) < Number(oldestMessageId)) {
+              oldestMessageId = id
+            }
+          }
+
+          if (nearBottom) scrollToBottom()
+        })
+
+        // Scroll to bottom once the initial batch finishes loading
+        socket.on('initial messages done', () => {
+          scrollToBottom()
+        })
+
+        socket.on('older messages', (rows) => {
+          loading = false
+          loadIndicator.classList.remove('visible')
+
+          if (!rows.length) {
+            allLoaded = true
+            observer.unobserve(sentinel)
+            return
+          }
+
+          const prevHeight = messages.scrollHeight
+          const batchOldestId = rows[rows.length - 1].id
+
+          // rows is DESC (newest → oldest). Inserting in that order via
+          // insertBefore produces correct oldest-at-top → newest-at-bottom DOM order.
+          rows.forEach((row) => {
+            const li = createBubble(row.content, row.created_at, row.username)
+            li.dataset.id = row.id
+            messages.insertBefore(li, loadIndicator.nextSibling)
+          })
+
+          oldestMessageId = batchOldestId
+          messages.scrollTop = messages.scrollHeight - prevHeight
+        })
+      }
+    </script>
+  </body>
+</html>
